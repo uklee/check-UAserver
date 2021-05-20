@@ -1,6 +1,8 @@
 # should install requests, win10toast via pip
 import requests
 import time
+import os.path
+import sys
 from win10toast import ToastNotifier
 
 
@@ -12,7 +14,11 @@ URL_TO_CHECK = ["https://student.kaist.ac.kr/web/main",
                 ]
 
 
+
+
+
 def check(URL): # False may caused by either Server problem or internet connection problem
+    # return False #fortest
     try:
         response = requests.get(URL)
         if (response.status_code == 200):
@@ -30,6 +36,15 @@ def check_internet_connection():
     return check(RELIABLE_URL)
     
 
+def resource_path(relative_path):   # to find icon file
+    """ Get absolute path to resource, works for PyInstaller """
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 
 
 
@@ -39,7 +54,6 @@ toaster = ToastNotifier()
 while (True):
         server_status = True
 
-
         
         for URL in URL_TO_CHECK:
             if (not check(URL)):
@@ -48,20 +62,21 @@ while (True):
 
 
 
+
         if (server_status):                     # Server Fine
             print("Server fine.", time.strftime('%c', time.localtime(time.time()))) # Not will be shown in final program. (hidden shell)
+
         
         else:
             if (check_internet_connection()):   # Server in TROUBLE
                 print("Please check the server!!", time.strftime('%c', time.localtime(time.time())))
                 toaster.show_toast(title    = "UA SERVER WARNING",
                                    msg      = "Cannot retrieve request from server properly. Please Check\n" + time.strftime('%c', time.localtime(time.time())),
-                                   icon_path="UA.ico",
+                                   icon_path= resource_path("UA.ico"),
                                    duration = CHECK_PERIOD
                                    )
 
                 
-
             else:                               # Internet Problem
                 print("Internet Connection Problem..", time.strftime('%c', time.localtime(time.time())))
 
@@ -77,6 +92,5 @@ while (True):
 
 
 
-        time.sleep(CHECK_PERIOD)
 
-    
+        time.sleep(CHECK_PERIOD)
