@@ -8,6 +8,8 @@ from win10toast import ToastNotifier
 
 CHECK_PERIOD = 300  # unit: sec
 # CHECK_PERIOD = 10  # fortest
+WRITE_LOG = False
+LOG_PATH="C:\\Logs\\check_UAserver.log"
 RELIABLE_URL = "https://1.1.1.1/"
 URL_TO_CHECK = ["https://student.kaist.ac.kr/web/main",
                 "https://student.kaist.ac.kr/web/api/banners",
@@ -78,6 +80,10 @@ while (True):
 
     if (server_status):                     # Server Fine
         print("Server fine.", time.strftime('%c', time.localtime(time.time()))) # Not will be shown in final program. (hidden shell)
+        if (WRITE_LOG):
+            log = open(LOG_PATH, 'a')
+            log.write("[" + time.strftime('%c', time.localtime(time.time())) + "] Server fine.\n")
+            log.close()
 
     
     else:
@@ -89,6 +95,10 @@ while (True):
                                duration = CHECK_PERIOD,
                                threaded = True
                                )
+            if (WRITE_LOG):
+                log = open(LOG_PATH, 'a')
+                log.write("[" + time.strftime('%c', time.localtime(time.time())) + "] Cannot retrieve request from server properly. " + str(unavailable_URL) +  "\n")
+                log.close()
 
             
         else:                               # Internet Problem
